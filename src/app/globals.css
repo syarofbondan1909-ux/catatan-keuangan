@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-bg: transparent;
+  --color-dark-card: rgba(28, 29, 38, 0.9);
+  --color-brand-blue: #0f62fe;
+  --color-brand-cyan: #00d2ff;
+  --color-brand-green: #2ecc71;
+  --color-brand-orange: #ff5722;
+  --color-brand-yellow: #f1c40f;
+}
+
+:root {
+  --background: #0f1015;
+  --foreground: #ffffff;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-image: linear-gradient(rgba(15, 16, 21, 0.75), rgba(15, 16, 21, 0.95)), url('/bg-sasuke.png?v=4');
+  background-size: cover;
+  background-position: center;
+  background-attachment: scroll; /* Changed from fixed to fix mobile touch bug */
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+.bg-dark-card {
+  background-color: var(--color-dark-card);
+}
+
+/* Hide scrollbar for horizontal scroll areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Quick light mode mock via CSS invert */
+.light-theme .w-full.max-w-md {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #e5e4d9; /* To ensure proper invert base */
+}
+
+/* Re-invert images and specific colors so they look normal */
+.light-theme img,
+.light-theme svg {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.light-theme .bg-brand-green,
+.light-theme .text-brand-green,
+.light-theme .bg-brand-yellow,
+.light-theme .text-brand-yellow,
+.light-theme .bg-red-500,
+.light-theme .text-red-500 {
+  filter: saturate(1.5);
+}
