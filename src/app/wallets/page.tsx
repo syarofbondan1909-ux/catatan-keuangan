@@ -1,6 +1,8 @@
 import Header from "@/components/Header";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { deleteWallet } from "@/actions/wallet";
+import DeleteForm from "@/components/DeleteForm";
 
 export default async function WalletsPage() {
   const wallets = await prisma.wallet.findMany({
@@ -28,7 +30,7 @@ export default async function WalletsPage() {
 
       <div className="flex flex-col gap-4">
         {wallets.map((wallet) => (
-          <div key={wallet.id} className="bg-dark-card p-4 rounded-2xl flex justify-between items-center border border-white/5 hover:bg-white/5 transition-colors">
+          <div key={wallet.id} className="bg-dark-card p-4 rounded-2xl flex justify-between items-center border border-white/5 hover:bg-white/5 transition-colors group">
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                 wallet.type === 'debit' ? 'bg-brand-blue/10 text-brand-blue' : 
@@ -50,9 +52,16 @@ export default async function WalletsPage() {
                 </p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Saldo</p>
-              <h2 className="text-lg font-bold text-white">{formatRupiah(wallet.balance)}</h2>
+            <div className="text-right flex items-center justify-end gap-3">
+              <div>
+                <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Saldo</p>
+                <h2 className="text-lg font-bold text-white">{formatRupiah(wallet.balance)}</h2>
+              </div>
+              <DeleteForm 
+                action={deleteWallet.bind(null, wallet.id)}
+                confirmMessage="Yakin ingin menghapus dompet ini beserta seluruh transaksinya?"
+                title="Hapus dompet"
+              />
             </div>
           </div>
         ))}

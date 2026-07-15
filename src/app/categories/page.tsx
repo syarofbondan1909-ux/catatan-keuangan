@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-
 import TambahKategoriButton from "@/components/TambahKategoriButton";
+import { deleteCategory } from "@/actions/category";
+import DeleteForm from "@/components/DeleteForm";
 
 export default async function CategoriesPage() {
   const categories = await prisma.category.findMany({
@@ -28,16 +29,23 @@ export default async function CategoriesPage() {
         
         <div className="flex flex-col gap-3">
           {categories.map((c) => (
-            <div key={c.id} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl transition-colors border border-transparent hover:border-white/5">
+            <div key={c.id} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-xl transition-colors border border-transparent hover:border-white/5 group">
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${c.type === 'expense' ? 'bg-red-500' : 'bg-brand-green'}`}></div>
                 <span className="text-sm font-medium text-white">{c.name}</span>
               </div>
-              <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wider ${
-                c.type === 'expense' ? 'bg-red-500/10 text-red-500' : 'bg-brand-green/10 text-brand-green'
-              }`}>
-                {c.type === 'expense' ? 'Pengeluaran' : 'Pemasukan'}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wider ${
+                  c.type === 'expense' ? 'bg-red-500/10 text-red-500' : 'bg-brand-green/10 text-brand-green'
+                }`}>
+                  {c.type === 'expense' ? 'Pengeluaran' : 'Pemasukan'}
+                </span>
+                <DeleteForm 
+                  action={deleteCategory.bind(null, c.id)}
+                  confirmMessage="Yakin ingin menghapus kategori ini? Riwayat transaksi akan tetap aman (kategorinya menjadi kosong)."
+                  title="Hapus kategori"
+                />
+              </div>
             </div>
           ))}
         </div>

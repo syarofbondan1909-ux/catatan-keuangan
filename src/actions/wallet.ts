@@ -53,3 +53,51 @@ export async function createWallet(data: {
     return { success: false, error: "Gagal membuat dompet" };
   }
 }
+
+export async function deleteWallet(id: string) {
+  try {
+    const transfersOut = await prisma.transaction.findMany({
+      where: { walletId: id, type: "transfer", toWalletId: { not: null } }
+    });
+    for (const t of transfersOut) {
+      if (t.toWalletId) {
+        await prisma.wallet.update({
+          where: { id: t.toWalletId },
+          data: { balance: { decrement: t.amount } }
+        });
+      }
+    }
+
+    const transfersIn = await prisma.transaction.findMany({
+      where: { toWalletId: id, type: "transfer" }
+    });
+    for (const t of transfersIn) {
+      await prisma.wallet.update({
+        where: { id: t.walletId },
+        data: { balance: { increment: t.amount } }
+      });
+    }
+
+    await prisma.transaction.deleteMany({
+      where: {
+        OR: [
+          { walletId: id },
+          { toWalletId: id }
+        ]
+      }
+    });
+
+    await prisma.wallet.delete({
+      where: { id }
+    });
+
+    revalidatePath("/");
+    revalidatePath("/wallets");
+    revalidatePath("/transactions");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete wallet:", error);
+    return { success: false, error: "Gagal menghapus dompet" };
+  }
+}

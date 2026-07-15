@@ -23,3 +23,25 @@ export async function createCategory(data: {
     return { success: false, error: "Gagal membuat kategori" };
   }
 }
+
+export async function deleteCategory(id: string) {
+  try {
+    await prisma.transaction.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: null }
+    });
+
+    await prisma.category.delete({
+      where: { id }
+    });
+
+    revalidatePath("/");
+    revalidatePath("/categories");
+    revalidatePath("/transactions");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete category:", error);
+    return { success: false, error: "Gagal menghapus kategori" };
+  }
+}
