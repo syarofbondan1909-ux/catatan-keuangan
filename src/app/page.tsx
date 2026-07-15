@@ -9,26 +9,28 @@ export default async function Home() {
   let errorDetails = "";
 
   try {
-    // Fetch real data from DB
-    wallets = await prisma.wallet.findMany();
-    
-    // Get current month transactions for income/expense calculation
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    transactions = await prisma.transaction.findMany({
-      where: { date: { gte: startOfMonth } },
-      include: { category: true, wallet: true },
-      orderBy: { date: 'desc' }
-    });
+    // Fetch real data from DB concurrently using Promise.all
+    const [fetchedWallets, fetchedTransactions, fetchedRecent] = await Promise.all([
+      prisma.wallet.findMany(),
+      prisma.transaction.findMany({
+        where: { date: { gte: startOfMonth } },
+        include: { category: true, wallet: true },
+        orderBy: { date: 'desc' }
+      }),
+      prisma.transaction.findMany({
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true, wallet: true, toWallet: true }
+      })
+    ]);
 
-    // Recent transactions (last 3)
-    recentTransactions = await prisma.transaction.findMany({
-      take: 3,
-      orderBy: { createdAt: 'desc' },
-      include: { category: true, wallet: true, toWallet: true }
-    });
+    wallets = fetchedWallets;
+    transactions = fetchedTransactions;
+    recentTransactions = fetchedRecent;
   } catch (e: any) {
     errorDetails = e.message || e.toString();
     console.error("PRISMA ERROR:", e);
