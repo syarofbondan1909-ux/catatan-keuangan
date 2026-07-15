@@ -3,8 +3,9 @@ import prisma from "@/lib/prisma";
 import { deleteTransaction } from "@/actions/transaction";
 
 export default async function Home() {
-  let wallets = [];
-  let transactions = [];
+  let wallets: any[] = [];
+  let transactions: any[] = [];
+  let recentTransactions: any[] = [];
   let errorDetails = "";
 
   try {
@@ -20,6 +21,13 @@ export default async function Home() {
       where: { date: { gte: startOfMonth } },
       include: { category: true, wallet: true },
       orderBy: { date: 'desc' }
+    });
+
+    // Recent transactions (last 3)
+    recentTransactions = await prisma.transaction.findMany({
+      take: 3,
+      orderBy: { createdAt: 'desc' },
+      include: { category: true, wallet: true, toWallet: true }
     });
   } catch (e: any) {
     errorDetails = e.message || e.toString();
@@ -39,20 +47,12 @@ export default async function Home() {
 
   const totalBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
 
-
   const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const expense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
   const formatRupiah = (value: number) => {
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(value);
   };
-
-  // Recent transactions (last 3)
-  const recentTransactions = await prisma.transaction.findMany({
-    take: 3,
-    orderBy: { createdAt: 'desc' },
-    include: { category: true, wallet: true, toWallet: true }
-  });
 
   return (
     <main className="p-5 flex flex-col gap-6">

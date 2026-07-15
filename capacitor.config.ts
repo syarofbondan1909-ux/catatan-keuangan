@@ -3,9 +3,9 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'id.catatankeuangan.app',
   appName: 'Catatan Keuangan',
-  webDir: '.next',
+  webDir: 'public',
   server: {
-    url: 'http://192.168.1.6:3000',
+    url: 'https://catatan-keuangan-tqk1-eight.vercel.app',
     cleartext: true
   }
 };
