@@ -1,11 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function EditProfilePage() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState("https://api.dicebear.com/7.x/avataaars/svg?seed=Bondan");
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setAvatarUrl(url);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,14 +46,25 @@ export default function EditProfilePage() {
       {/* Avatar Edit */}
       <div className="flex flex-col items-center mb-8">
         <div className="relative mb-3">
-          <div className="w-24 h-24 rounded-full bg-slate-700 overflow-hidden border-2 border-brand-yellow">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bondan" alt="Avatar" className="w-full h-full object-cover opacity-80" />
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            accept="image/*" 
+            className="hidden" 
+          />
+          <div className="w-24 h-24 rounded-full bg-slate-700 overflow-hidden border-2 border-brand-yellow cursor-pointer" onClick={handleAvatarClick}>
+            <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover opacity-100" />
           </div>
-          <button className="absolute bottom-0 right-0 w-8 h-8 bg-brand-yellow text-dark-bg rounded-full border-2 border-dark-bg flex items-center justify-center hover:scale-105 transition-transform">
+          <button 
+            type="button"
+            onClick={handleAvatarClick}
+            className="absolute bottom-0 right-0 w-8 h-8 bg-brand-yellow text-black rounded-full border-2 border-[#0f1015] flex items-center justify-center hover:scale-105 transition-transform"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
           </button>
         </div>
-        <p className="text-xs text-brand-green font-medium">Ubah Foto Profil</p>
+        <button type="button" onClick={handleAvatarClick} className="text-xs text-brand-green font-medium hover:underline">Ubah Foto Profil</button>
       </div>
 
       {/* Form */}
@@ -71,11 +96,11 @@ export default function EditProfilePage() {
           <button 
             type="submit" 
             disabled={isSaving}
-            className="w-full bg-brand-green hover:bg-brand-green/90 text-dark-bg font-bold py-4 rounded-xl transition-all shadow-[0_4px_14px_rgba(46,204,113,0.39)] disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2"
+            className="w-full bg-brand-green hover:bg-brand-green/90 text-black font-bold py-4 rounded-xl transition-all shadow-[0_4px_14px_rgba(46,204,113,0.39)] disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2"
           >
             {isSaving ? (
               <>
-                <div className="w-4 h-4 border-2 border-dark-bg/30 border-t-dark-bg rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
                 Menyimpan...
               </>
             ) : "Simpan Perubahan"}
