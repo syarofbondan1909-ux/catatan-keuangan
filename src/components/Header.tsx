@@ -1,10 +1,18 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Header({ name = "Bondan" }: { name?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [profile, setProfile] = useState({ name: name, avatar: "" });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("user_profile");
+    if (saved) {
+      setProfile(JSON.parse(saved));
+    }
+  }, []);
 
   const handleNotifClick = () => {
     // Play sound
@@ -24,11 +32,11 @@ export default function Header({ name = "Bondan" }: { name?: string }) {
       <header className="flex justify-between items-center mt-2 relative z-50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden border border-white/10">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bondan" alt="Avatar" className="w-full h-full object-cover" />
+            <img src={profile.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`} alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-slate-400">Hai,</p>
-            <h1 className="text-sm font-semibold text-white">{name}</h1>
+            <h1 className="text-sm font-semibold text-white">{profile.name}</h1>
           </div>
         </div>
         <div className="flex items-center gap-3">
