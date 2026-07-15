@@ -1,13 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function EditProfilePage() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState("https://api.dicebear.com/7.x/avataaars/svg?seed=Bondan");
+  const [profile, setProfile] = useState({
+    name: "Bondan",
+    phone: "0895-0888-2222",
+    email: "bondan@gmail.com",
+    avatar: ""
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("user_profile");
+    if (saved) {
+      setProfile(JSON.parse(saved));
+    }
+  }, []);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -16,14 +28,18 @@ export default function EditProfilePage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setAvatarUrl(url);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, avatar: reader.result as string });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    localStorage.setItem("user_profile", JSON.stringify(profile));
     setTimeout(() => {
       setIsSaving(false);
       router.back();
@@ -54,7 +70,7 @@ export default function EditProfilePage() {
             className="hidden" 
           />
           <div className="w-24 h-24 rounded-full bg-slate-700 overflow-hidden border-2 border-brand-yellow cursor-pointer" onClick={handleAvatarClick}>
-            <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover opacity-100" />
+            <img src={profile.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`} alt="Avatar" className="w-full h-full object-cover opacity-100" />
           </div>
           <button 
             type="button"
@@ -73,21 +89,21 @@ export default function EditProfilePage() {
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold tracking-wide text-slate-400 ml-1">NAMA LENGKAP</label>
           <div className="bg-dark-card border border-white/10 rounded-xl px-4 py-3 focus-within:border-brand-green transition-colors">
-            <input type="text" defaultValue="Bondan" className="w-full bg-transparent text-white outline-none text-sm" />
+            <input type="text" value={profile.name} onChange={(e) => setProfile({...profile, name: e.target.value})} className="w-full bg-transparent text-white outline-none text-sm" />
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold tracking-wide text-slate-400 ml-1">NOMOR TELEPON</label>
           <div className="bg-dark-card border border-white/10 rounded-xl px-4 py-3 focus-within:border-brand-green transition-colors">
-            <input type="tel" defaultValue="0895-0888-2222" className="w-full bg-transparent text-white outline-none text-sm" />
+            <input type="tel" value={profile.phone} onChange={(e) => setProfile({...profile, phone: e.target.value})} className="w-full bg-transparent text-white outline-none text-sm" />
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold tracking-wide text-slate-400 ml-1">ALAMAT EMAIL</label>
           <div className="bg-dark-card border border-white/10 rounded-xl px-4 py-3 focus-within:border-brand-green transition-colors opacity-70">
-            <input type="email" defaultValue="bondan@gmail.com" readOnly className="w-full bg-transparent text-slate-300 outline-none text-sm cursor-not-allowed" />
+            <input type="email" value={profile.email} readOnly className="w-full bg-transparent text-slate-300 outline-none text-sm cursor-not-allowed" />
           </div>
           <p className="text-[10px] text-slate-500 ml-1 mt-1">Email tidak dapat diubah setelah registrasi.</p>
         </div>
