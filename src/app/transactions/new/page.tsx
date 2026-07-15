@@ -55,7 +55,14 @@ export default function NewTransactionPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !selectedWallet) return;
+    if (!amount) {
+      alert("Masukkan nominal transaksi.");
+      return;
+    }
+    if (!selectedWallet) {
+      alert("Silakan buat Dompet terlebih dahulu sebelum menyimpan transaksi.");
+      return;
+    }
     
     setIsSaving(true);
     

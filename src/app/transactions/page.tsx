@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import prisma from "@/lib/prisma";
 import { deleteTransaction } from "@/actions/transaction";
 import Link from "next/link";
+import DeleteForm from "@/components/DeleteForm";
 
 export default async function TransactionsPage(
   props: {
@@ -131,12 +132,11 @@ export default async function TransactionsPage(
                       {tx.type === 'expense' ? '-' : tx.type === 'income' ? '+' : ''}
                       {formatRupiah(tx.amount)}
                     </div>
-                    {/* @ts-ignore */}
-                  <form action={deleteTx}>
-                      <button type="submit" className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" title="Hapus transaksi">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                      </button>
-                    </form>
+                    <DeleteForm 
+                      action={deleteTx}
+                      confirmMessage="Yakin ingin menghapus transaksi ini?"
+                      title="Hapus transaksi"
+                    />
                   </div>
                 </div>
               )})
