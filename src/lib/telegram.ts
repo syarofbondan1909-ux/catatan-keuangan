@@ -1,5 +1,5 @@
 export async function sendTelegramMessage(chatId: string, text: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   if (!token) {
     console.error("TELEGRAM_BOT_TOKEN is not set");
     return { success: false, error: "Token not set" };
@@ -33,7 +33,7 @@ export async function sendTelegramMessage(chatId: string, text: string) {
 }
 
 export async function setTelegramWebhook(webhookUrl: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   if (!token) {
     return { success: false, error: "Token not set" };
   }
