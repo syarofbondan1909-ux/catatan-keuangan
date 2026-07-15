@@ -27,7 +27,7 @@ export default function DeleteForm({
       <button 
         type="submit" 
         disabled={isPending}
-        className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 disabled:opacity-50" 
+        className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all disabled:opacity-50 shrink-0" 
         title={title}
       >
         {isPending ? (
