@@ -3,20 +3,42 @@ import prisma from "@/lib/prisma";
 import { deleteTransaction } from "@/actions/transaction";
 
 export default async function Home() {
-  // Fetch real data from DB
-  const wallets = await prisma.wallet.findMany();
+  let wallets = [];
+  let transactions = [];
+  let errorDetails = "";
+
+  try {
+    // Fetch real data from DB
+    wallets = await prisma.wallet.findMany();
+    
+    // Get current month transactions for income/expense calculation
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    transactions = await prisma.transaction.findMany({
+      where: { date: { gte: startOfMonth } },
+      include: { category: true, wallet: true },
+      orderBy: { date: 'desc' }
+    });
+  } catch (e: any) {
+    errorDetails = e.message || e.toString();
+    console.error("PRISMA ERROR:", e);
+  }
+
+  if (errorDetails) {
+    return (
+      <main className="p-5 flex flex-col gap-6">
+        <div className="bg-red-500/20 p-5 rounded-xl border border-red-500">
+          <h2 className="text-xl font-bold text-red-500 mb-2">Database Error!</h2>
+          <pre className="text-xs text-red-300 whitespace-pre-wrap">{errorDetails}</pre>
+        </div>
+      </main>
+    );
+  }
+
   const totalBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
 
-  // Get current month transactions for income/expense calculation
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  const transactions = await prisma.transaction.findMany({
-    where: { date: { gte: startOfMonth } },
-    include: { category: true, wallet: true },
-    orderBy: { date: 'desc' }
-  });
 
   const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const expense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
