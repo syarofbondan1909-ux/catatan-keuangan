@@ -5,6 +5,8 @@ import BottomNav from "@/components/BottomNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Catatan Keuangan",
   description: "Aplikasi catatan keuangan pribadi",
