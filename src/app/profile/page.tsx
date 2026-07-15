@@ -63,7 +63,7 @@ export default function ProfilePage() {
               <div className="w-16 h-16 rounded-full bg-slate-700 overflow-hidden border-2 border-white/10">
                 <img src={profile.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`} alt="Avatar" className="w-full h-full object-cover" />
               </div>
-              <button onClick={() => setIsEditing(true)} className="absolute -bottom-2 -right-2 w-7 h-7 bg-brand-yellow rounded-md flex items-center justify-center text-dark-bg border-2 border-dark-card shadow-sm hover:scale-105 active:scale-95 transition-transform cursor-pointer">
+              <button onClick={() => setIsEditing(true)} className="absolute -bottom-2 -right-2 w-7 h-7 bg-brand-yellow rounded-md flex items-center justify-center text-black border-2 border-dark-card shadow-sm hover:scale-105 active:scale-95 transition-transform cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
               </button>
             </div>
@@ -96,7 +96,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex gap-3 mt-2">
               <button onClick={() => setIsEditing(false)} className="flex-1 py-3 rounded-xl font-bold text-sm bg-white/5 text-white hover:bg-white/10 transition-colors">Batal</button>
-              <button onClick={handleSave} className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-yellow text-dark-bg shadow-[0_4px_14px_rgba(241,196,15,0.4)] hover:bg-yellow-400 transition-colors">Simpan</button>
+              <button onClick={handleSave} className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-yellow text-black shadow-[0_4px_14px_rgba(241,196,15,0.4)] hover:bg-yellow-400 transition-colors">Simpan</button>
             </div>
           </div>
         )}
