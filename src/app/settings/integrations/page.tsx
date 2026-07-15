@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { saveTelegramChatId, getTelegramStatus, disconnectTelegram, setupWebhook } from "@/actions/telegram";
 
 export default function IntegrationsPage() {
   const router = useRouter();
@@ -13,8 +14,20 @@ export default function IntegrationsPage() {
 
   // Telegram State
   const [tgEnabled, setTgEnabled] = useState(false);
-  const [tgUsername, setTgUsername] = useState("");
+  const [tgChatId, setTgChatId] = useState("");
   const [tgConnected, setTgConnected] = useState(false);
+  const [isSavingTg, setIsSavingTg] = useState(false);
+  const [isSettingWebhook, setIsSettingWebhook] = useState(false);
+
+  useEffect(() => {
+    getTelegramStatus().then((status) => {
+      setTgConnected(status.connected);
+      if (status.connected) {
+        setTgEnabled(true);
+        setTgChatId(status.chatId);
+      }
+    });
+  }, []);
 
   const handleConnectWa = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +37,41 @@ export default function IntegrationsPage() {
     }
   };
 
-  const handleConnectTg = (e: React.FormEvent) => {
+  const handleConnectTg = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(tgUsername) {
+    if (!tgChatId) return;
+    
+    setIsSavingTg(true);
+    const res = await saveTelegramChatId(tgChatId);
+    setIsSavingTg(false);
+    
+    if (res.success) {
       setTgConnected(true);
-      alert("Telegram Berhasil Dihubungkan ke " + tgUsername);
+      alert("Telegram Berhasil Dihubungkan!");
+    } else {
+      alert("Gagal: " + res.error);
+    }
+  };
+
+  const handleDisconnectTg = async () => {
+    const res = await disconnectTelegram();
+    if (res.success) {
+      setTgConnected(false);
+      setTgChatId("");
+      setTgEnabled(false);
+    }
+  };
+
+  const handleSetWebhook = async () => {
+    setIsSettingWebhook(true);
+    const origin = window.location.origin;
+    const res = await setupWebhook(origin);
+    setIsSettingWebhook(false);
+    
+    if (res.success) {
+      alert("Server Telegram Bot berhasil diaktifkan!");
+    } else {
+      alert("Gagal mengaktifkan server: " + res.error);
     }
   };
 
@@ -126,27 +169,35 @@ export default function IntegrationsPage() {
             <div className="animate-in slide-in-from-top-4 fade-in duration-300">
               <div className="w-full h-px bg-white/10 my-4"></div>
               <form onSubmit={handleConnectTg} className="flex flex-col gap-3">
-                <label className="text-xs font-semibold text-slate-400">USERNAME TELEGRAM</label>
+                <label className="text-xs font-semibold text-slate-400">CHAT ID TELEGRAM</label>
                 <div className="flex gap-2">
                   <div className="bg-white/5 border border-white/10 rounded-xl px-4 flex items-center text-slate-300">
-                    @
+                    ID
                   </div>
                   <input 
-                    type="text" 
-                    value={tgUsername}
-                    onChange={(e) => setTgUsername(e.target.value)}
-                    placeholder="bondan_finance" 
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                    type="number" 
+                    value={tgChatId}
+                    onChange={(e) => setTgChatId(e.target.value)}
+                    placeholder="123456789" 
+                    disabled={tgConnected}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors disabled:opacity-50"
                   />
                 </div>
+                <p className="text-[10px] text-slate-400">Kirim <strong>/start</strong> ke bot Telegram Anda untuk melihat Chat ID.</p>
+                
                 {!tgConnected ? (
-                  <button type="submit" className="w-full bg-[#0088cc] text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition-colors mt-2 shadow-lg shadow-blue-500/20">
-                    Kirim Pesan Uji Coba
+                  <button type="submit" disabled={isSavingTg} className="w-full bg-[#0088cc] text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition-colors mt-2 shadow-lg shadow-blue-500/20 disabled:opacity-50">
+                    {isSavingTg ? "Menghubungkan..." : "Hubungkan Chat ID"}
                   </button>
                 ) : (
-                  <button type="button" onClick={() => {setTgConnected(false); setTgEnabled(false)}} className="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500/20 transition-colors mt-2">
-                    Putuskan Koneksi
-                  </button>
+                  <>
+                    <button type="button" onClick={handleSetWebhook} disabled={isSettingWebhook} className="w-full bg-brand-green/20 text-brand-green font-bold py-3 rounded-xl transition-colors mt-2">
+                      {isSettingWebhook ? "Loading..." : "Aktifkan Server Bot (Set Webhook)"}
+                    </button>
+                    <button type="button" onClick={handleDisconnectTg} className="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500/20 transition-colors mt-2">
+                      Putuskan Koneksi
+                    </button>
+                  </>
                 )}
               </form>
             </div>
