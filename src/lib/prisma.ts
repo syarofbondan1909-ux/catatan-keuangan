@@ -2,7 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres.wkpqzodkkeqhypuurzuv:Syarofbondan4636@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true";
+const pool = new Pool({ connectionString: dbUrl });
 const adapter = new PrismaPg(pool);
 
 const prismaClientSingleton = () => {
