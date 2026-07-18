@@ -54,6 +54,26 @@ export default async function TransactionsPage(
     return acc;
   }, {} as Record<string, typeof transactions>);
 
+  const weeklyStats = Array(7).fill(0).map(() => ({ income: 0, expense: 0 }));
+  
+  transactions.forEach(tx => {
+    const dayOfWeek = new Date(tx.date).getDay(); // 0 (Sun) - 6 (Sat)
+    const index = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0 (Mon) - 6 (Sun)
+    
+    if (tx.type === 'income') {
+      weeklyStats[index].income += tx.amount;
+    } else if (tx.type === 'expense') {
+      weeklyStats[index].expense += tx.amount;
+    }
+  });
+
+  let maxAmount = 0;
+  weeklyStats.forEach(stat => {
+    if (stat.income > maxAmount) maxAmount = stat.income;
+    if (stat.expense > maxAmount) maxAmount = stat.expense;
+  });
+  if (maxAmount === 0) maxAmount = 1;
+
   return (
     <main className="p-5 flex flex-col gap-6 min-h-screen relative pb-24">
       {/* Header */}
@@ -72,22 +92,32 @@ export default async function TransactionsPage(
         </Link>
       </div>
 
-      {/* Analytics Chart Mock */}
+      {/* Analytics Chart */}
       <div className="bg-dark-card border border-white/5 rounded-3xl p-5 relative overflow-hidden">
         <div className="flex justify-between items-center mb-6">
-          <p className="text-xs font-bold text-slate-400 tracking-wider">STATISTIK PENGELUARAN</p>
-          <div className="flex gap-2">
-            <span className="w-2 h-2 rounded-full bg-brand-green"></span>
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+          <p className="text-[11px] font-bold text-slate-400 tracking-wider">STATISTIK (PER HARI)</p>
+          <div className="flex gap-2 items-center">
+            <span className="w-2 h-2 rounded-full bg-brand-green shadow-[0_0_5px_rgba(46,204,113,0.5)]"></span>
+            <span className="text-[9px] text-slate-400 mr-1 uppercase">Pemasukan</span>
+            <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)]"></span>
+            <span className="text-[9px] text-slate-400 uppercase">Pengeluaran</span>
           </div>
         </div>
-        <div className="flex items-end justify-between h-32 gap-2 mt-4 px-2">
-          {[40, 70, 30, 85, 50, 95, 60].map((height, i) => (
-            <div key={i} className="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
-              <div className="w-full relative flex items-end justify-center h-full bg-white/5 rounded-t-md overflow-hidden">
+        <div className="flex items-end justify-between h-32 gap-2 mt-4 px-1">
+          {weeklyStats.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 flex-1 group cursor-pointer h-full justify-end">
+              <div className="w-full relative flex items-end justify-center h-full bg-white/5 rounded-t-md overflow-hidden gap-[2px] p-[2px]">
+                {/* Income Bar */}
                 <div 
-                  className={`w-full rounded-t-md transition-all duration-500 ease-out shadow-[0_0_15px_rgba(46,204,113,0.5)] ${i % 2 === 0 ? 'bg-red-500/80' : 'bg-brand-green/80'}`} 
-                  style={{ height: `${height}%` }}
+                  className="w-1/2 rounded-t-sm transition-all duration-500 ease-out bg-brand-green/80 hover:bg-brand-green shadow-[0_0_10px_rgba(46,204,113,0.3)]" 
+                  style={{ height: `${(stat.income / maxAmount) * 100}%` }}
+                  title={`Pemasukan: Rp ${stat.income.toLocaleString('id-ID')}`}
+                ></div>
+                {/* Expense Bar */}
+                <div 
+                  className="w-1/2 rounded-t-sm transition-all duration-500 ease-out bg-red-500/80 hover:bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]" 
+                  style={{ height: `${(stat.expense / maxAmount) * 100}%` }}
+                  title={`Pengeluaran: Rp ${stat.expense.toLocaleString('id-ID')}`}
                 ></div>
               </div>
               <span className="text-[10px] text-slate-500 font-medium">{['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][i]}</span>
