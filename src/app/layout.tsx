@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import AudioProvider from "@/components/AudioProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,6 +50,7 @@ export default function RootLayout({
         <div className="w-full max-w-md mx-auto bg-transparent min-h-[100dvh] relative pb-32 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
           {children}
           
+          <AudioProvider />
           <BottomNav />
         </div>
       </body>
