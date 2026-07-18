@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getFormData, createTransaction } from "@/actions/transaction";
+import { coinSound } from "@/lib/audio";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -10,6 +11,7 @@ const QRScanner = dynamic(() => import("@/components/QRScanner"), { ssr: false }
 
 export default function NewTransactionPage() {
   const router = useRouter();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [type, setType] = useState<"expense" | "income" | "transfer">("expense");
   const [amount, setAmount] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -29,6 +31,10 @@ export default function NewTransactionPage() {
 
   useEffect(() => {
     setIsClient(true);
+    
+    // Inisialisasi audio untuk suara notifikasi (suara koin/kasir)
+    audioRef.current = new Audio(coinSound);
+    
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     setDate(now.toISOString().slice(0, 16));
@@ -66,6 +72,12 @@ export default function NewTransactionPage() {
       return;
     }
     
+    // Mainkan suara secara sinkron (langsung saat diklik) untuk menghindari pemblokiran Autoplay di HP
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+    }
+    
     setIsSaving(true);
     
     const res = await createTransaction({
@@ -81,8 +93,11 @@ export default function NewTransactionPage() {
     setIsSaving(false);
     
     if (res.success) {
-      router.back();
-      router.refresh();
+      // Tunggu sesaat sebelum pindah agar animasi dan suara selesai
+      setTimeout(() => {
+        router.back();
+        router.refresh();
+      }, 500);
     } else {
       alert("Gagal menyimpan transaksi");
     }

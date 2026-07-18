@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { notifSound } from "@/lib/audio";
 
 export default function Header({ name = "Bondan" }: { name?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function Header({ name = "Bondan" }: { name?: string }) {
   const handleNotifClick = () => {
     // Play sound
     if (!audioRef.current) {
-      audioRef.current = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+      audioRef.current = new Audio(notifSound);
     }
     audioRef.current.currentTime = 0;
     audioRef.current.play().catch(e => console.log("Audio play failed:", e));

@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, useRef } from "react";
+import { deleteSound } from "@/lib/audio";
 
 export default function DeleteForm({ 
   action, 
@@ -12,10 +13,17 @@ export default function DeleteForm({
   title: string;
 }) {
   const [isPending, startTransition] = useTransition();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault();
     if (confirm(confirmMessage)) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(deleteSound);
+      }
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+      
       startTransition(() => {
         action();
       });
