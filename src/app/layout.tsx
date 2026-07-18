@@ -46,7 +46,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-background text-foreground transition-colors duration-300`}>
         {/* Mobile Container */}
-        <div className="w-full max-w-md mx-auto bg-dark-bg min-h-screen relative pb-32 shadow-2xl">
+        <div className="w-full max-w-md mx-auto bg-transparent min-h-[100dvh] relative pb-32 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
           {children}
           
           <BottomNav />

@@ -123,7 +123,7 @@ export default async function TransactionsPage(
                     <div>
                       <h4 className="text-sm font-bold text-white">{tx.category?.name || "Transfer"}</h4>
                       <p className="text-[10px] text-slate-400">
-                        {tx.type === 'transfer' ? `${tx.wallet?.name} -> ${tx.toWallet?.name}` : tx.wallet?.name}
+                        {tx.type === 'transfer' ? `${tx.wallet?.name} -> ${tx.toWallet?.name}` : tx.wallet?.name} • {new Date(tx.date).toLocaleString("id-ID", { hour: '2-digit', minute: '2-digit' }).replace(/\./g, ':')}
                       </p>
                     </div>
                   </div>

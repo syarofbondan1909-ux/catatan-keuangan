@@ -62,26 +62,29 @@ export default function BottomNav() {
   return (
     <>
       {/* Custom Floating Action Button (FAB) */}
-      <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50">
-        <Link href="/transactions/new" className="w-14 h-14 bg-gradient-to-tr from-brand-orange to-red-500 rounded-full flex items-center justify-center shadow-lg shadow-brand-orange/30 border-[3px] border-dark-bg text-white hover:scale-105 active:scale-95 transition-transform">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+        <Link href="/transactions/new" className="w-16 h-16 bg-gradient-to-tr from-brand-blue to-brand-cyan rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(15,98,254,0.4)] border-4 border-[#0f1015] text-white hover:scale-110 active:scale-95 transition-all duration-300 group">
+          <svg className="group-hover:rotate-90 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
         </Link>
       </div>
 
-      <nav className="fixed bottom-0 w-full max-w-md bg-dark-card border-t border-white/5 flex justify-between items-center h-16 px-6 z-40 rounded-t-3xl">
+      <nav className="fixed bottom-0 w-full max-w-md glass-card border-t border-white/5 flex justify-between items-center h-[72px] px-6 z-40 rounded-t-3xl pb-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`flex flex-col items-center transition-all duration-300 ${item.className} ${
+              className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${item.className} ${
                 isActive 
-                  ? "text-brand-yellow drop-shadow-[0_0_8px_rgba(241,196,15,0.5)] scale-110" 
-                  : "text-slate-500 hover:text-white"
+                  ? "bg-white/10 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]" 
+                  : "text-slate-500 hover:text-slate-300"
               }`}
             >
-              {item.icon}
+              <div className={isActive ? "animate-in zoom-in duration-300" : ""}>
+                {item.icon}
+              </div>
+              {isActive && <span className="absolute bottom-1 w-1 h-1 bg-brand-cyan rounded-full shadow-[0_0_8px_rgba(0,210,255,0.8)]"></span>}
             </Link>
           );
         })}

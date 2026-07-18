@@ -29,7 +29,9 @@ export default function NewTransactionPage() {
 
   useEffect(() => {
     setIsClient(true);
-    setDate(new Date().toISOString().split('T')[0]);
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    setDate(now.toISOString().slice(0, 16));
     getFormData().then((data) => {
       setWallets(data.wallets);
       setCategories(data.categories);
@@ -259,9 +261,9 @@ export default function NewTransactionPage() {
           )}
 
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-semibold tracking-wider text-slate-400">TANGGAL</label>
+            <label className="text-[10px] font-semibold tracking-wider text-slate-400">TANGGAL & WAKTU</label>
             <input 
-              type="date" 
+              type="datetime-local" 
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="w-full bg-[#12131a] border border-white/5 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-green transition-colors [color-scheme:dark]" 
